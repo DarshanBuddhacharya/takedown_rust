@@ -1,14 +1,16 @@
+use crate::resources::rectangle::Player;
 use macroquad::prelude::*;
 
-#[macroquad::main("BasicShapes")]
-async fn main() {
-    loop {
-        clear_background(RED);
+mod resources;
 
-        draw_line(40.0, 40.0, 100.0, 200.0, 15.0, BLUE);
-        draw_rectangle(screen_width() / 2.0 - 60.0, 100.0, 120.0, 60.0, GREEN);
-        draw_circle(screen_width() - 30.0, screen_height() - 30.0, 15.0, YELLOW);
-        draw_text("HELLO", 20.0, 20.0, 20.0, DARKGRAY);
+#[macroquad::main("Takedown")]
+async fn main() {
+    let player_1 = Player::new(0.02);
+    let player_2 = Player::new(0.92);
+    loop {
+        clear_background(BLACK);
+        player_1.draw(BLUE);
+        player_2.draw(GREEN);
 
         next_frame().await
     }
