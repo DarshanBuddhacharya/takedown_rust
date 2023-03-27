@@ -1,45 +1,15 @@
-use ggez::event::{self, EventHandler};
-use ggez::graphics::{self, Color};
-use ggez::{Context, ContextBuilder, GameResult};
+use macroquad::prelude::*;
 
-fn main() {
-    // Make a Context.
-    let (mut ctx, event_loop) = ContextBuilder::new("Takedown", "Ram Baran Yadav")
-        .build()
-        .expect("aieee, could not create ggez context!");
+#[macroquad::main("BasicShapes")]
+async fn main() {
+    loop {
+        clear_background(RED);
 
-    // Create an instance of your event handler.
-    // Usually, you should provide it with the Context object to
-    // use when setting your game up.
-    let my_game = MyGame::new(&mut ctx);
-    ctx.gfx.set_window_title("Takedown");
+        draw_line(40.0, 40.0, 100.0, 200.0, 15.0, BLUE);
+        draw_rectangle(screen_width() / 2.0 - 60.0, 100.0, 120.0, 60.0, GREEN);
+        draw_circle(screen_width() - 30.0, screen_height() - 30.0, 15.0, YELLOW);
+        draw_text("HELLO", 20.0, 20.0, 20.0, DARKGRAY);
 
-    // Run!
-    event::run(ctx, event_loop, my_game);
-}
-
-struct MyGame {
-    // Your state here...
-}
-
-impl MyGame {
-    pub fn new(_ctx: &mut Context) -> MyGame {
-        // Load/create resources such as images here.
-        MyGame {
-            // ...
-        }
-    }
-}
-
-impl EventHandler for MyGame {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        // Update code here...
-        Ok(())
-    }
-
-    fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        let mut canvas = graphics::Canvas::from_frame(ctx, Color::WHITE);
-        // Draw code here...
-        canvas.finish(ctx)
+        next_frame().await
     }
 }
