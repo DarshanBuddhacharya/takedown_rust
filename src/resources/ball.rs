@@ -4,8 +4,8 @@ const BALL_SIZE: f32 = 10.0;
 const BALL_SPEED: f32 = 250.0;
 
 pub struct Ball {
-    dimention: Circle,
-    vel: Vec2,
+    pub dimention: Circle,
+    pub vel: Vec2,
 }
 
 impl Ball {
