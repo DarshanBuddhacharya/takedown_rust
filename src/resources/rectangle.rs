@@ -1,10 +1,10 @@
 use macroquad::prelude::*;
 
-const RECT_SIZE: macroquad::math::Vec2 = Vec2::from_array([40.0, 150.0]);
+const RECT_SIZE: macroquad::math::Vec2 = Vec2::from_array([10.0, 150.0]);
 const PLAYER_SPEED: f32 = 700.0;
 
 pub struct Player {
-    rect: Rect,
+    pub rect: Rect,
 }
 
 impl Player {
