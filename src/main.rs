@@ -1,7 +1,7 @@
 use crate::resources::rectangle::Player;
 use macroquad::prelude::*;
 use resources::ball::Ball;
-use utils::collision::detect_collision;
+use utils::{ball_lost::detect_loss, collision::detect_collision};
 
 mod resources;
 mod utils;
@@ -15,8 +15,8 @@ async fn main() {
     let mut player_1 = Player::new(0.02);
     let mut player_2 = Player::new(0.97);
 
-    let player_1_score = 0;
-    let player_2_score = 0;
+    let mut player_1_score = 0;
+    let mut player_2_score = 0;
 
     let mut ball = Ball::new(vec2(screen_height() * 0.5, screen_width() * 0.5));
 
@@ -25,14 +25,26 @@ async fn main() {
         player_2.update(get_frame_time(), false);
         ball.update(get_frame_time());
 
-        detect_collision(&mut ball.dimention, &mut ball.vel, &player_1.rect);
-        detect_collision(&mut ball.dimention, &mut ball.vel, &player_2.rect);
-
         clear_background(BLACK);
         player_1.draw(BLUE);
         player_2.draw(GREEN);
         ball.draw();
 
+        //To detect collision between ball and the player(RECT)
+        detect_collision(&mut ball.dimention, &mut ball.vel, &player_1.rect);
+        detect_collision(&mut ball.dimention, &mut ball.vel, &player_2.rect);
+
+        //To increase player's score
+        let (returned_1_score, returned_2_score) = detect_loss(&mut ball);
+
+        if returned_1_score != 0 {
+            player_1_score += 1
+        }
+        if returned_2_score != 0 {
+            player_2_score += 1
+        }
+
+        //To Create Score board UI
         let score_header = format!("score");
         let score_header_dimention = measure_text(&score_header, Some(font), HEADER_FONT_SIZE, 1.0);
 
@@ -53,7 +65,6 @@ async fn main() {
                 ..Default::default()
             },
         );
-
         draw_text_ex(
             &p1_score,
             screen_width() * 0.3 - p1_score_dimention.width * 0.5,
