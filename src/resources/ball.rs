@@ -12,7 +12,7 @@ impl Ball {
     pub fn new(pos: Vec2) -> Self {
         Self {
             dimention: Circle::new(pos.x, pos.y, BALL_SIZE),
-            vel: vec2(1.0, rand::gen_range(-1.0, 1.0)).normalize(),
+            vel: vec2(1.2, rand::gen_range(-1.0, 1.0)).normalize(),
         }
     }
 
