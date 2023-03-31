@@ -11,7 +11,7 @@ impl Player {
     pub fn new(postion_x: f32) -> Self {
         Self {
             rect: Rect::new(
-                screen_width() * postion_x,
+                postion_x,
                 screen_height() * 0.5 - RECT_SIZE.y * 0.5,
                 RECT_SIZE.x,
                 RECT_SIZE.y,
