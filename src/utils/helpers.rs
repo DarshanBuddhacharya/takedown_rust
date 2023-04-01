@@ -43,3 +43,16 @@ pub fn reset_game(
     *invalid_input = false;
     *invalid_difficulty = false;
 }
+
+//This Function resets the game to initial state
+pub fn restart_game(
+    player_1: &mut Player,
+    player_2: &mut Player,
+    player_1_score: &mut i32,
+    player_2_score: &mut i32,
+) {
+    *player_1 = Player::new(10.0);
+    *player_2 = Player::new(screen_width() - 20.0);
+    *player_1_score = 0;
+    *player_2_score = 0;
+}

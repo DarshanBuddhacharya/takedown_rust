@@ -4,7 +4,7 @@ use resources::ball::Ball;
 use utils::{
     ball_lost::detect_loss,
     collision::detect_collision,
-    helpers::reset_game,
+    helpers::{reset_game, restart_game},
     text_format::{draw_description_text, draw_error_text, draw_header_text},
 };
 
@@ -101,6 +101,12 @@ async fn main() {
                         }
                     }
                     MenuState::Difficulty => {
+                        invalid_input = false;
+                        if is_key_pressed(KeyCode::Escape) {
+                            round = 0;
+                            game_state = GameState::Menu(MenuState::Rounds)
+                        }
+
                         if is_key_pressed(KeyCode::Key1) {
                             level = 300.0;
                             difficulty = 1;
@@ -123,11 +129,18 @@ async fn main() {
                                 invalid_difficulty = true; // Set the flag to display the message
                             }
                         }
+
                         draw_description_text(
                             &format!("Select a difficulty level from 1 - 5"),
                             font,
                             screen_height() * 0.40,
                             DESCRIPTION_FONT_SIZE,
+                        );
+                        draw_description_text(
+                            &format!("Press ESC to go Back"),
+                            font,
+                            screen_height() * 0.98,
+                            20,
                         );
                         if invalid_difficulty {
                             draw_error_text(font);
@@ -225,35 +238,41 @@ async fn main() {
                     draw_description_text(
                         &format!("Player 1 wins the game"),
                         font,
-                        screen_height() * 0.4,
+                        screen_height() * 0.3,
                         DESCRIPTION_FONT_SIZE,
                     );
                 } else {
                     draw_description_text(
                         &format!("Player 2 wins the game"),
                         font,
-                        screen_height() * 0.4,
+                        screen_height() * 0.3,
                         DESCRIPTION_FONT_SIZE,
                     );
                 }
                 draw_description_text(
                     &format!("final score"),
                     font,
-                    screen_height() * 0.5,
+                    screen_height() * 0.4,
                     DESCRIPTION_FONT_SIZE,
                 );
                 draw_description_text(
                     &format!("{}   {}", player_1_score, player_2_score),
                     font,
-                    screen_height() * 0.6,
+                    screen_height() * 0.5,
                     PLAYER_SCORE_SIZE,
                 );
 
                 draw_description_text(
+                    &format!("Press R to restart the game"),
+                    font,
+                    screen_height() * 0.6,
+                    18,
+                );
+                draw_description_text(
                     &format!("Press Space to continue"),
                     font,
                     screen_height() * 0.7,
-                    20,
+                    30,
                 );
                 if is_key_pressed(KeyCode::Space) {
                     game_state = GameState::Menu(MenuState::Landing);
@@ -269,6 +288,16 @@ async fn main() {
                         &mut invalid_difficulty,
                     );
                 }
+
+                if is_key_pressed(KeyCode::R) {
+                    game_state = GameState::Game;
+                    restart_game(
+                        &mut player_1,
+                        &mut player_2,
+                        &mut player_1_score,
+                        &mut player_2_score,
+                    )
+                }
             }
             GameState::Pause => {
                 draw_header_text(&format!("Game Paused"), font);
@@ -278,8 +307,23 @@ async fn main() {
                     screen_height() * 0.5,
                     DESCRIPTION_FONT_SIZE,
                 );
+                draw_description_text(
+                    &format!("Press R to restart the game"),
+                    font,
+                    screen_height() * 0.6,
+                    20,
+                );
                 if is_key_pressed(KeyCode::Space) {
                     game_state = GameState::Game;
+                }
+                if is_key_pressed(KeyCode::R) {
+                    game_state = GameState::Game;
+                    restart_game(
+                        &mut player_1,
+                        &mut player_2,
+                        &mut player_1_score,
+                        &mut player_2_score,
+                    )
                 }
             }
         }
