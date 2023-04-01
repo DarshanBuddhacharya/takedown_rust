@@ -1,9 +1,10 @@
-use crate::resources::rectangle::Player;
+use crate::{resources::rectangle::Player, utils::helpers::parse_digit};
 use macroquad::prelude::*;
 use resources::ball::Ball;
 use utils::{
     ball_lost::detect_loss,
     collision::detect_collision,
+    helpers::reset_game,
     text_format::{draw_description_text, draw_header_text},
 };
 
@@ -12,32 +13,26 @@ mod utils;
 
 const DESCRIPTION_FONT_SIZE: u16 = 32;
 const PLAYER_SCORE_SIZE: u16 = 35;
-const GAMEOVER_SCORE: i32 = 3;
 
 enum GameState {
-    Menu,
+    Menu(MenuState),
     Game,
     Pause,
     Complete,
 }
-
-fn reset_game(
-    player_1: &mut Player,
-    player_2: &mut Player,
-    player_1_score: &mut i32,
-    player_2_score: &mut i32,
-) {
-    *player_1 = Player::new(10.0);
-    *player_2 = Player::new(screen_width() - 20.0);
-    *player_1_score = 0;
-    *player_2_score = 0;
+#[derive(Clone, Copy)]
+enum MenuState {
+    Landing,
+    Rounds,
+    Tutorial,
+    Difficulty,
 }
 
 #[macroquad::main("Takedown")]
 async fn main() {
     let font = load_ttf_font("./font/Anton-Regular.ttf").await.unwrap();
 
-    let mut game_state = GameState::Menu;
+    let mut game_state = GameState::Menu(MenuState::Landing);
 
     let mut player_1_score = 0;
     let mut player_2_score = 0;
@@ -47,27 +42,85 @@ async fn main() {
     let mut player_1 = Player::new(10.0);
     let mut player_2 = Player::new(screen_width() - 20.0);
 
+    let mut round = 0;
+
+    let mut invalid_input = false;
+
     loop {
         match game_state {
-            GameState::Menu => {
-                if is_key_pressed(KeyCode::Space) {
-                    game_state = GameState::Game;
-                }
+            GameState::Menu(state) => {
                 draw_header_text(&format!("TakeDown"), font);
+                match state {
+                    MenuState::Landing => {
+                        if is_key_pressed(KeyCode::Space) {
+                            game_state = GameState::Menu(MenuState::Rounds);
+                        }
+                        if is_key_pressed(KeyCode::T) {
+                            game_state = GameState::Menu(MenuState::Tutorial);
+                        }
 
-                draw_description_text(
-                    &format!("First to {} points wins the game", GAMEOVER_SCORE),
-                    font,
-                    screen_height() * 0.45,
-                    25,
-                );
+                        draw_description_text(
+                            &format!("Press T to open tutorial"),
+                            font,
+                            screen_height() * 0.40,
+                            25,
+                        );
 
-                draw_description_text(
-                    &format!("Press Space to start the game"),
-                    font,
-                    screen_height() * 0.55,
-                    DESCRIPTION_FONT_SIZE,
-                );
+                        draw_description_text(
+                            &format!("Press Space to start the game"),
+                            font,
+                            screen_height() * 0.55,
+                            DESCRIPTION_FONT_SIZE,
+                        );
+                    }
+                    MenuState::Rounds => {
+                        // Check for key presses and update the level accordingly
+                        if let Some(key) = get_last_key_pressed() {
+                            if let Some(digit) = parse_digit(key) {
+                                round = digit;
+                            }
+                            invalid_input = true;
+                        }
+
+                        draw_description_text(
+                            &format!("Select a Score limit from 1 - 9"),
+                            font,
+                            screen_height() * 0.40,
+                            DESCRIPTION_FONT_SIZE,
+                        );
+
+                        // If the user enters an invalid key, prompt them to enter a valid number
+                        if invalid_input {
+                            let invalid_message = format!("Please Enter a valid number");
+                            let invalid_message_dimention =
+                                measure_text(&invalid_message, Some(font), 25, 1.0);
+                            draw_text_ex(
+                                &invalid_message,
+                                screen_width() * 0.5 - invalid_message_dimention.width * 0.5,
+                                screen_height() * 0.7,
+                                TextParams {
+                                    font,
+                                    font_size: 25,
+                                    color: RED,
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                        if round > 0 {
+                            game_state = GameState::Menu(MenuState::Difficulty);
+                        }
+                    }
+                    MenuState::Difficulty => {
+                        if is_key_pressed(KeyCode::Space) {
+                            game_state = GameState::Game;
+                        }
+                    }
+                    MenuState::Tutorial => {
+                        if is_key_pressed(KeyCode::Space) {
+                            game_state = GameState::Menu(MenuState::Landing);
+                        }
+                    }
+                }
 
                 player_1.draw(BLUE);
                 player_2.draw(GREEN);
@@ -122,6 +175,7 @@ async fn main() {
                         ..Default::default()
                     },
                 );
+                draw_description_text(&format!("First to {}", round), font, 100.0, 25);
                 draw_text_ex(
                     &p2_score,
                     screen_width() * 0.7 - p2_score_dimention.width * 0.5,
@@ -139,7 +193,7 @@ async fn main() {
                     screen_height() * 0.98,
                     20,
                 );
-                if player_1_score == GAMEOVER_SCORE || player_2_score == GAMEOVER_SCORE {
+                if player_1_score == round || player_2_score == round {
                     game_state = GameState::Complete
                 }
             }
@@ -180,12 +234,14 @@ async fn main() {
                     20,
                 );
                 if is_key_pressed(KeyCode::Space) {
-                    game_state = GameState::Menu;
+                    game_state = GameState::Menu(MenuState::Landing);
                     reset_game(
                         &mut player_1,
                         &mut player_2,
                         &mut player_1_score,
                         &mut player_2_score,
+                        &mut invalid_input,
+                        &mut round,
                     );
                 }
             }
