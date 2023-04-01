@@ -31,3 +31,19 @@ pub fn draw_description_text(text: &str, font: Font, y: f32, size: u16) {
         },
     );
 }
+
+pub fn draw_error_text(font: Font) {
+    let invalid_message = format!("Please Enter a valid number");
+    let invalid_message_dimention = measure_text(&invalid_message, Some(font), 25, 1.0);
+    draw_text_ex(
+        &invalid_message,
+        screen_width() * 0.5 - invalid_message_dimention.width * 0.5,
+        screen_height() * 0.7,
+        TextParams {
+            font,
+            font_size: 25,
+            color: RED,
+            ..Default::default()
+        },
+    );
+}

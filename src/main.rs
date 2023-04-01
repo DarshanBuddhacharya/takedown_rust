@@ -5,7 +5,7 @@ use utils::{
     ball_lost::detect_loss,
     collision::detect_collision,
     helpers::reset_game,
-    text_format::{draw_description_text, draw_header_text},
+    text_format::{draw_description_text, draw_error_text, draw_header_text},
 };
 
 mod resources;
@@ -37,14 +37,17 @@ async fn main() {
     let mut player_1_score = 0;
     let mut player_2_score = 0;
 
-    let mut ball = Ball::new(vec2(screen_height() * 0.5, screen_width() * 0.5));
-
     let mut player_1 = Player::new(10.0);
     let mut player_2 = Player::new(screen_width() - 20.0);
 
     let mut round = 0;
+    let mut level = 0.0;
+    let mut difficulty = 0;
+
+    let mut ball = Ball::new(vec2(screen_height() * 0.5, screen_width() * 0.5));
 
     let mut invalid_input = false;
+    let mut invalid_difficulty = false;
 
     loop {
         match game_state {
@@ -91,27 +94,45 @@ async fn main() {
 
                         // If the user enters an invalid key, prompt them to enter a valid number
                         if invalid_input {
-                            let invalid_message = format!("Please Enter a valid number");
-                            let invalid_message_dimention =
-                                measure_text(&invalid_message, Some(font), 25, 1.0);
-                            draw_text_ex(
-                                &invalid_message,
-                                screen_width() * 0.5 - invalid_message_dimention.width * 0.5,
-                                screen_height() * 0.7,
-                                TextParams {
-                                    font,
-                                    font_size: 25,
-                                    color: RED,
-                                    ..Default::default()
-                                },
-                            );
+                            draw_error_text(font);
                         }
                         if round > 0 {
                             game_state = GameState::Menu(MenuState::Difficulty);
                         }
                     }
                     MenuState::Difficulty => {
-                        if is_key_pressed(KeyCode::Space) {
+                        if is_key_pressed(KeyCode::Key1) {
+                            level = 300.0;
+                            difficulty = 1;
+                        } else if is_key_pressed(KeyCode::Key2) {
+                            level = 350.0;
+                            difficulty = 2;
+                        } else if is_key_pressed(KeyCode::Key3) {
+                            level = 400.0;
+                            difficulty = 3;
+                        } else if is_key_pressed(KeyCode::Key4) {
+                            level = 500.0;
+                            difficulty = 4;
+                        } else if is_key_pressed(KeyCode::Key5) {
+                            level = 550.0;
+                            difficulty = 5;
+                        } else if let Some(key) = get_last_key_pressed() {
+                            if let Some(digit) = parse_digit(key) {
+                                difficulty = digit;
+                            } else {
+                                invalid_difficulty = true; // Set the flag to display the message
+                            }
+                        }
+                        draw_description_text(
+                            &format!("Select a difficulty level from 1 - 5"),
+                            font,
+                            screen_height() * 0.40,
+                            DESCRIPTION_FONT_SIZE,
+                        );
+                        if invalid_difficulty {
+                            draw_error_text(font);
+                        }
+                        if level > 0.0 {
                             game_state = GameState::Game;
                         }
                     }
@@ -128,7 +149,7 @@ async fn main() {
             GameState::Game => {
                 player_1.update(get_frame_time(), true);
                 player_2.update(get_frame_time(), false);
-                ball.update(get_frame_time());
+                ball.update(get_frame_time(), level);
 
                 if is_key_pressed(KeyCode::Escape) {
                     game_state = GameState::Pause;
@@ -175,7 +196,8 @@ async fn main() {
                         ..Default::default()
                     },
                 );
-                draw_description_text(&format!("First to {}", round), font, 100.0, 25);
+                draw_description_text(&format!("First to {}", round), font, 90.0, 20);
+                draw_description_text(&format!("Level {}", difficulty), font, 120.0, 20);
                 draw_text_ex(
                     &p2_score,
                     screen_width() * 0.7 - p2_score_dimention.width * 0.5,
@@ -240,8 +262,11 @@ async fn main() {
                         &mut player_2,
                         &mut player_1_score,
                         &mut player_2_score,
-                        &mut invalid_input,
                         &mut round,
+                        &mut level,
+                        &mut difficulty,
+                        &mut invalid_input,
+                        &mut invalid_difficulty,
                     );
                 }
             }
