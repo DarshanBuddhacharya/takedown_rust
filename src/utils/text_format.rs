@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-const HEADER_FONT_SIZE: u16 = 40;
+const HEADER_FONT_SIZE: u16 = 35;
 
 pub fn draw_header_text(text: &str, font: Font) {
     let dimentions = measure_text(text, Some(font), HEADER_FONT_SIZE, 1.0);
