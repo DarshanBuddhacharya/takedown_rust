@@ -158,10 +158,17 @@ async fn main() {
 
                 player_1.draw(BLUE);
                 player_2.draw(GREEN);
+
+                // player_1_center.draw(BLUE);
+                // player_2_center.draw(GREEN);
             }
             GameState::Game => {
                 player_1.update(get_frame_time(), true);
                 player_2.update(get_frame_time(), false);
+
+                // player_1_center.update(get_frame_time(), true);
+                // player_2_center.update(get_frame_time(), false);
+
                 ball.update(get_frame_time(), level);
 
                 if is_key_pressed(KeyCode::Escape) {
@@ -171,6 +178,9 @@ async fn main() {
                 clear_background(BLACK);
                 player_1.draw(BLUE);
                 player_2.draw(GREEN);
+
+                // player_1_center.draw(YELLOW);
+                // player_2_center.draw(YELLOW);
                 ball.draw();
 
                 //To detect collision between ball and the player(RECT)
