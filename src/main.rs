@@ -8,6 +8,8 @@ use utils::{
     text_format::{draw_description_text, draw_error_text, draw_header_text},
 };
 
+use macroquad_particles::{self as particles, AtlasConfig, BlendMode, Emitter, EmitterConfig};
+
 mod resources;
 mod utils;
 
@@ -26,6 +28,20 @@ enum MenuState {
     Rounds,
     Tutorial,
     Difficulty,
+}
+
+fn fire() -> particles::EmitterConfig {
+    particles::EmitterConfig {
+        lifetime: 0.8,
+        lifetime_randomness: 0.1,
+        emitting: false,
+        amount: 12,
+        atlas: Some(AtlasConfig::new(4, 4, 8..)),
+        initial_direction_spread: 0.5,
+        size: 15.0,
+        blend_mode: BlendMode::Additive,
+        ..Default::default()
+    }
 }
 
 #[macroquad::main("Takedown")]
@@ -48,6 +64,13 @@ async fn main() {
 
     let mut invalid_input = false;
     let mut invalid_difficulty = false;
+
+    let texture = load_texture("./src/images/smoke_fire.png").await.unwrap();
+    let mut flying_emitter_world = Emitter::new(EmitterConfig {
+        local_coords: false,
+        texture: Some(texture),
+        ..fire()
+    });
 
     loop {
         match game_state {
@@ -162,6 +185,7 @@ async fn main() {
             GameState::Game => {
                 player_1.update(get_frame_time(), true);
                 player_2.update(get_frame_time(), false);
+
                 ball.update(get_frame_time(), level);
 
                 if is_key_pressed(KeyCode::Escape) {
@@ -171,14 +195,28 @@ async fn main() {
                 clear_background(BLACK);
                 player_1.draw(BLUE);
                 player_2.draw(GREEN);
+
+                // player_1_center.draw(YELLOW);
+                // player_2_center.draw(YELLOW);
                 ball.draw();
 
                 //To detect collision between ball and the player(RECT)
-                detect_collision(&mut ball.dimention, &mut ball.vel, &player_1.rect);
-                detect_collision(&mut ball.dimention, &mut ball.vel, &player_2.rect);
+                detect_collision(
+                    &mut ball.dimention,
+                    &mut ball.vel,
+                    &player_1.rect,
+                    &mut flying_emitter_world,
+                );
+                detect_collision(
+                    &mut ball.dimention,
+                    &mut ball.vel,
+                    &player_2.rect,
+                    &mut flying_emitter_world,
+                );
 
                 //To increase player's score
-                let (returned_1_score, returned_2_score) = detect_loss(&mut ball);
+                let (returned_1_score, returned_2_score) =
+                    detect_loss(&mut ball, &mut flying_emitter_world);
 
                 if returned_1_score != 0 {
                     player_1_score += 1
@@ -231,6 +269,8 @@ async fn main() {
                 if player_1_score == round || player_2_score == round {
                     game_state = GameState::Complete
                 }
+
+                // flying_emitter_world.config.emitting = true;
             }
             GameState::Complete => {
                 draw_header_text(&format!("Game Over"), font);
