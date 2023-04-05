@@ -5,7 +5,7 @@ use utils::{
     ball_lost::detect_loss,
     collision::detect_collision,
     helpers::{reset_game, restart_game},
-    text_format::{draw_description_text, draw_error_text, draw_header_text},
+    text_format::{draw_description_text, draw_error_text, draw_header_text, draw_text},
 };
 
 use macroquad_particles::{self as particles, AtlasConfig, BlendMode, Emitter, EmitterConfig};
@@ -173,6 +173,73 @@ async fn main() {
                         }
                     }
                     MenuState::Tutorial => {
+                        draw_description_text(
+                            &format!("Tutorial"),
+                            font,
+                            120.0,
+                            DESCRIPTION_FONT_SIZE,
+                        );
+                        draw_text(
+                            &format!("P1"),
+                            font,
+                            screen_width() * 0.12,
+                            screen_height() * 0.3,
+                            28,
+                            WHITE,
+                        );
+                        draw_text(
+                            &format!("W - UP"),
+                            font,
+                            screen_width() * 0.12,
+                            screen_height() * 0.45,
+                            25,
+                            WHITE,
+                        );
+                        draw_text(
+                            &format!("S - DOWN"),
+                            font,
+                            screen_width() * 0.12,
+                            screen_height() * 0.55,
+                            25,
+                            WHITE,
+                        );
+
+                        draw_text(
+                            &format!("P2"),
+                            font,
+                            screen_width() * 0.88,
+                            screen_height() * 0.3,
+                            28,
+                            WHITE,
+                        );
+                        draw_text(
+                            &format!("Key - UP"),
+                            font,
+                            screen_width() * 0.88,
+                            screen_height() * 0.45,
+                            25,
+                            WHITE,
+                        );
+                        draw_text(
+                            &format!("Key - DOWN"),
+                            font,
+                            screen_width() * 0.88,
+                            screen_height() * 0.55,
+                            25,
+                            WHITE,
+                        );
+                        draw_description_text(
+                            &format!("Touching the Yellow provides Boost!"),
+                            font,
+                            screen_height() * 0.5,
+                            25,
+                        );
+                        draw_description_text(
+                            &format!("Press space to continue"),
+                            font,
+                            screen_height() * 0.98,
+                            DESCRIPTION_FONT_SIZE,
+                        );
                         if is_key_pressed(KeyCode::Space) {
                             game_state = GameState::Menu(MenuState::Landing);
                         }
