@@ -206,12 +206,14 @@ async fn main() {
                     &mut ball.vel,
                     &player_1.rect,
                     &mut flying_emitter_world,
+                    font,
                 );
                 detect_collision(
                     &mut ball.dimention,
                     &mut ball.vel,
                     &player_2.rect,
                     &mut flying_emitter_world,
+                    font,
                 );
 
                 //To increase player's score

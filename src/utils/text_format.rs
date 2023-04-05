@@ -2,6 +2,21 @@ use macroquad::prelude::*;
 
 const HEADER_FONT_SIZE: u16 = 35;
 
+pub fn draw_text(text: &str, font: Font, x: f32, y: f32, size: u16, color: Color) {
+    let dimentions = measure_text(text, Some(font), size, 1.0);
+    draw_text_ex(
+        text,
+        x - dimentions.width * 0.5,
+        y,
+        TextParams {
+            font,
+            font_size: size,
+            color,
+            ..Default::default()
+        },
+    );
+}
+
 pub fn draw_header_text(text: &str, font: Font) {
     let dimentions = measure_text(text, Some(font), HEADER_FONT_SIZE, 1.0);
     draw_text_ex(
