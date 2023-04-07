@@ -1,7 +1,6 @@
 use macroquad::prelude::*;
 
 const BALL_SIZE: f32 = 10.0;
-const BALL_SPEED: f32 = 250.0;
 
 pub struct Ball {
     pub dimention: Circle,
@@ -16,9 +15,9 @@ impl Ball {
         }
     }
 
-    pub fn update(&mut self, delta_time: f32) {
-        self.dimention.x += self.vel.x * delta_time * BALL_SPEED;
-        self.dimention.y += self.vel.y * delta_time * BALL_SPEED;
+    pub fn update(&mut self, delta_time: f32, level: f32) {
+        self.dimention.x += self.vel.x * delta_time * level;
+        self.dimention.y += self.vel.y * delta_time * level;
 
         if self.dimention.y < 0.0 {
             self.vel.y = 1.0;

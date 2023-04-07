@@ -48,5 +48,12 @@ impl Player {
 
     pub fn draw(&self, color: Color) {
         draw_rectangle(self.rect.x, self.rect.y, self.rect.w, self.rect.h, color);
+        draw_rectangle(
+            self.rect.x,
+            self.rect.center().y - 20.0 * 0.5,
+            self.rect.w,
+            20.0,
+            YELLOW,
+        );
     }
 }
