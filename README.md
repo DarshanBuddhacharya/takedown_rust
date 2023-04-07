@@ -1,4 +1,4 @@
-# TakeDown V1
+# TakeDown V1.5
 
 TakeDown is a 2 player pong-like game written in Rust using the macroquad.rs game development framework.
 
@@ -36,14 +36,16 @@ Pause Game: **ESC**
 - Two-player mode
 - Realistic physics simulation
 - Score tracking
+- level options
+- rounds options
+- power ups
+- Ingame tutorial
+- Improved UI screen
 
 ## Next Update V2
 
-- Adjustable difficulty level
-- Adjustable score limit
-- Tutorial screen
-- Improved graphics
-- Improved UI screen
+- Game modes
+- Improved UI
 
 ## Contributing
 
